@@ -29,6 +29,14 @@
             this.neighbours = neighbours;
             this.flag = flag;
         }
+        public bool getMine()
+        {
+            return mine;
+        }
+        public void setMine()
+        {
+            mine = true;
+        }
     }
     class Grid
     {
