@@ -29,6 +29,7 @@
             this.neighbours = neighbours;
             this.flag = flag;
         }
+        //hello
         public bool getMine()
         {
             return mine;
