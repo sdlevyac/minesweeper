@@ -37,6 +37,26 @@
         {
             mine = true;
         }
+        public bool getFlag()
+        {
+            return flag;
+        }
+        public void addFlag()
+        {
+            flag = true;
+        }
+        public void removeFlag()
+        {
+            flag = false;
+        }
+        public int getNeighbours()
+        {
+            return neighbours;
+        }
+        public void setNeighbours(int _neighbours)
+        {
+            neighbours = _neighbours;
+        }
     }
     class Grid
     {
@@ -51,26 +71,35 @@
         {
             this.width = width;
             this.height = height;
-            grid = new int[width, height];
-            revealed = new bool[width, height];
-            neighbours = new int[width, height];
+            //grid = new int[width, height];
+            squares = new Square[width, height];
+            for (int i = 0; i < width; i++)
+            {
+                for (int j = 0; j < height; j++)
+                {
+                    squares[i, j] = new Square(false, false, 0, false);
+                }
+            }
+            //revealed = new bool[width, height];
+            //neighbours = new int[width, height];
             rnd = new Random(1234);
         }
         public void placeMines()
         {
-            int numberOfMines = (width * height) / 10;
+            int numberOfMines = (width * height) / 20;
             for (int i = 0; i < numberOfMines; i++)
             {
                 int mineX = rnd.Next(0, width);
                 int mineY = rnd.Next(1, height);
                 
                 
-                while (grid[mineX, mineY] != 0)
+                while (squares[mineX,mineY].getMine())//(grid[mineX, mineY] != 0)
                 {
                     mineX = rnd.Next(0, width);
                     mineY = rnd.Next(1, height);
                 }
-                grid[mineX, mineY] = 1;
+                //grid[mineX, mineY] = 1;
+                squares[mineX, mineY].setMine();
 
 
             }
@@ -84,7 +113,9 @@
                 for (int y = 0; y < height; y++)
                 {
                     //output += !revealed[x, y] ? "." : grid[x, y];
-                    output += grid[x,y] == 1 ? "@" : neighbours[x, y].ToString();
+                    //output += grid[x,y] == 1 ? "@" : neighbours[x, y].ToString();
+                    //output += squares[x, y].getMine() ? "@" : squares[x, y].getNeighbours().ToString();
+                    output += squares[x, y].getNeighbours().ToString();
                 }
                 output += "\n";
             }
@@ -107,11 +138,12 @@
                                 ny >= 0 && ny < height &&
                                 !(x == nx && y == ny))
                             {
-                                num += grid[nx, ny];
+                                num += squares[nx,ny].getMine() ? 1 : 0;
                             }
                         }
                     }
-                    neighbours[x, y] = num;
+                    //neighbours[x, y] = num;
+                    squares[x, y].setNeighbours(num);
                 }
             }
         }
