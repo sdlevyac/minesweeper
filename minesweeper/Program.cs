@@ -5,9 +5,11 @@
         static bool gameOver = false;
         static Grid myGrid;
         static bool firstTurn = true;
+        static int width = 25;
+        static int height = 25;
         static void Main(string[] args)
         {
-            myGrid = new Grid(25, 25);
+            myGrid = new Grid(width, height);
             myGrid.placeMines();
             
             loop();
@@ -19,6 +21,14 @@
             Console.SetCursorPosition(0, 0);
             Console.WriteLine(grid.drawGrid());
         }
+        static (int x, int y) getInputs()
+        {
+            Console.WriteLine("enter x coord:");
+            int x = int.Parse(Console.ReadLine());
+            Console.WriteLine("enter y coord:");
+            int y = int.Parse(Console.ReadLine());
+            return (x, y);
+        }
         static void loop()
         {
             //first turn
@@ -27,19 +37,18 @@
             {
                 draw(myGrid);
                 Console.WriteLine("your turn:");
-                Console.WriteLine("Options: R, Reveal; F, Flag");
-                string choice = Console.ReadLine();
-                Console.WriteLine("enter x coord:");
-                int x = int.Parse(Console.ReadLine());
-                Console.WriteLine("enter y coord:");
-                int y = int.Parse(Console.ReadLine());
+                Console.WriteLine("Options: R, Reveal; F, Flag; A, Reveal All; H, Hide All");
+                string choice = Console.ReadLine().ToUpper();
+
                 if (choice == "F")
                 {
+                    (int x, int y) = getInputs(); 
                     myGrid.getSquare(x, y).addFlag();
                     myGrid.getSquare(x, y).reveal();
                 }
                 else if (choice == "R")
                 {
+                    (int x, int y) = getInputs();
                     if (firstTurn)
                     {
                         for (int i = x - 5; i < x + 5; i++)
@@ -60,6 +69,27 @@
                     else
                     {
                         myGrid.getSquare(x, y).reveal();
+                    }
+                    myGrid.calculateNeighbours();
+                }
+                else if (choice == "A")
+                {
+                    for (int i = 0; i < width; i++)
+                    {
+                        for (int j = 0; j < height; j++)
+                        {
+                            myGrid.getSquare(i, j).reveal();
+                        }
+                    }
+                }
+                else if (choice == "H")
+                {
+                    for (int i = 0; i < width; i++)
+                    {
+                        for (int j = 0; j < height; j++)
+                        {
+                            myGrid.getSquare(i, j).hide();
+                        }
                     }
                 }
             }
@@ -114,6 +144,10 @@
         public void reveal()
         {
             revealed = true;
+        }
+        public void hide()
+        {
+            revealed = false;
         }
         public bool getRevealed()
         {
@@ -183,9 +217,17 @@
         }
         public string drawGrid()
         {
-            string output = "";
+            string output = "\n   ";
+            for (int y = 0; y < height; y++)
+            {
+                output += y.ToString("00");
+                output += " ";
+            }
+            output += "\n";
             for (int x = 0; x < width; x++)
             {
+                output += x.ToString("00");
+                output += ": ";
                 for (int y = 0; y < height; y++)
                 {
                     //output += !revealed[x, y] ? "." : grid[x, y];
@@ -201,17 +243,19 @@
                         {
                             output += squares[x, y].getNeighbours().ToString();
                         }
+                        
                     }
                     else
                     {
                         output += ".";
                     }
+                    output += "| ";
                 }
                 output += "\n";
             }
             return output;
         }
-        private void calculateNeighbours()
+        public void calculateNeighbours()
         {
             for (int x = 0; x < width; x++)
             {
